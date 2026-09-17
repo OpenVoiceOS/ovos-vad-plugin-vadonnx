@@ -88,3 +88,27 @@ def test_opm_entry_point_loads():
                                  "ovos-vad-plugin-vadonnx": {"model": "silero-8k"}})
     assert isinstance(vad, VadonnxVAD)
     assert vad.model_name == "silero-8k"
+
+
+@pytest.mark.parametrize("model", ["silero", "silero-8k"])
+def test_speech_then_silence_chunk_is_speech(model):
+    """A chunk whose last frame is silence is speech when an earlier frame is speech."""
+    vad = VadonnxVAD({"model": model}, sample_rate=16000)
+    quarter = CHUNK // 4
+    detected = 0
+    for c in _chunks(_speech()):
+        # oracle: the speech part alone, read by vadonnx at its last frame
+        vad.reset()
+        head = c[:3 * quarter]
+        if vad.vad.process_chunk(head, sample_rate=16000) < vad.threshold:
+            continue
+        vad.reset()
+        mixed = c[:3 * quarter] + b"\x00" * quarter
+        assert not vad.is_silence(mixed)
+        detected += 1
+    assert detected >= 3
+
+
+def test_runtime_requirements_need_network_at_load():
+    req = VadonnxVAD.runtime_requirements
+    assert req.internet_before_load and req.network_before_load
