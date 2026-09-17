@@ -1,0 +1,49 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ovos-vad-plugin-vadonnx"
+dynamic = ["version"]
+description = "VAD plugin for OpenVoiceOS that runs any vadonnx model"
+readme = "README.md"
+license = { text = "Apache-2.0" }
+authors = [{ name = "JarbasAi", email = "jarbasai@mailfence.com" }]
+requires-python = ">=3.10"
+keywords = ["vad", "onnx", "ovos", "openvoiceos", "plugin", "voice-activity-detection"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Multimedia :: Sound/Audio :: Speech",
+]
+dependencies = [
+    "ovos-plugin-manager>=2.1.0,<3.0.0",
+    "ovos-utils",
+    "vadonnx>=0.1.1a1",
+    "numpy<3.0.0",
+]
+
+[project.optional-dependencies]
+fsmn = ["vadonnx[fsmn]>=0.1.1a1"]
+dev = ["pytest", "pytest-cov"]
+test = ["pytest", "pytest-cov"]
+
+[project.urls]
+Homepage = "https://github.com/OpenVoiceOS/ovos-vad-plugin-vadonnx"
+Repository = "https://github.com/OpenVoiceOS/ovos-vad-plugin-vadonnx"
+
+[project.entry-points."opm.VAD"]
+"ovos-vad-plugin-vadonnx" = "ovos_vad_plugin_vadonnx:VadonnxVAD"
+
+[tool.setuptools.packages.find]
+include = ["ovos_vad_plugin_vadonnx*"]
+
+[tool.setuptools.dynamic]
+version = { attr = "ovos_vad_plugin_vadonnx.version.__version__" }
